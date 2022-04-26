@@ -70,6 +70,7 @@ public class Main {
                             pf.used = false;
                         }
                     }
+
                 }else{
                     result.append("*");
                 }
