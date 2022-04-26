@@ -12,6 +12,8 @@ public class Main {
 
         ArrayList<PageFrame> pageFrames = new ArrayList<>();
 
+
+
         PageFrame A = new PageFrame('A');
         pageFrames.add(A);
         PageFrame B = new PageFrame('B');
@@ -25,31 +27,66 @@ public class Main {
             if (!line.isEmpty()) {
                 String[] splited = line.split(",");
                 for (String s : splited) {
-                    references.add(Integer.parseInt(s));
+                    references.add(Math.abs(Integer.parseInt(s)));
                 }
             }
         }
 
         while (!references.isEmpty()) {
-            int CurrentReference = references.get(0);
+            int currentReference = references.get(0);
             references.remove(0);
 
             boolean pageFault = true;
 
             for (PageFrame pf : pageFrames) {
-                if (pf.pageReference == CurrentReference) {
+                if (pf.pageReference == currentReference) {
+                    pf.used = true;
                     pageFault = false;
                     break;
                 }
             }
 
             if (pageFault) {
+                pageFaults++;
+                boolean solvable = false;
                 boolean solved = false;
-                //TODO
+
+                for (PageFrame pf : pageFrames) {
+                    if(pf.pageLockTime==0)
+                        solvable = true;
+                }
+
+                if (solvable){
+                    while(!solved){
+                        PageFrame pf = pageFrames.get(0);
+                        pageFrames.remove(0);
+                        if(!pf.used && pf.pageLockTime==0){
+                            pf.pageReference = currentReference;
+                            pf.pageLockTime = 4;
+                            solved = true;
+                            result.append(pf.frameID);
+
+                        }else if(pf.used && pf.pageLockTime==0) {
+                            pf.used = false;
+                        }
+                    }
+                }else{
+                    result.append("*");
+                }
+
             } else {
                 result.append("-");
             }
+
+            //reduce lock times
+            for (PageFrame pf : pageFrames) {
+                if (pf.pageLockTime > 0) {
+                    pf.pageLockTime--;
+                }
+            }
         }
+        System.out.println(result);
+        System.out.println(pageFaults);
     }
 }
 
